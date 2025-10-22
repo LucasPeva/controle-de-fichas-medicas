@@ -29,6 +29,7 @@ function criarTabela() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       nome TEXT NOT NULL,
       idade INTEGER NOT NULL,
+      cep TEXT NOT NULL,
       endereco TEXT NOT NULL,
       operacao TEXT NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -63,15 +64,15 @@ app.get('/api/pacientes/:id', (req, res) => {
 
 // POST - Criar novo paciente
 app.post('/api/pacientes', (req, res) => {
-  const { nome, idade, endereco, operacao } = req.body;
+  const { nome, idade, cep, endereco, operacao } = req.body;
 
-  if (!nome || !idade || !endereco || !operacao) {
+  if (!nome || !idade || !cep || !endereco || !operacao) {
     return res.status(400).json({ erro: 'Todos os campos são obrigatórios' });
   }
 
   db.run(
-    'INSERT INTO pacientes (nome, idade, endereco, operacao) VALUES (?, ?, ?, ?)',
-    [nome, idade, endereco, operacao],
+    'INSERT INTO pacientes (nome, idade, cep, endereco, operacao) VALUES (?, ?, ?, ?, ?)',
+    [nome, idade, cep, endereco, operacao],
     function(err) {
       if (err) {
         res.status(500).json({ erro: err.message });
@@ -85,15 +86,15 @@ app.post('/api/pacientes', (req, res) => {
 // PUT - Atualizar paciente
 app.put('/api/pacientes/:id', (req, res) => {
   const { id } = req.params;
-  const { nome, idade, endereco, operacao } = req.body;
+  const { nome, idade, cep, endereco, operacao } = req.body;
 
-  if (!nome || !idade || !endereco || !operacao) {
+  if (!nome || !idade || !cep || !endereco || !operacao) {
     return res.status(400).json({ erro: 'Todos os campos são obrigatórios' });
   }
 
   db.run(
-    'UPDATE pacientes SET nome = ?, idade = ?, endereco = ?, operacao = ? WHERE id = ?',
-    [nome, idade, endereco, operacao, id],
+    'UPDATE pacientes SET nome = ?, idade = ?, cep = ?, endereco = ?, operacao = ? WHERE id = ?',
+    [nome, idade, cep, endereco, operacao, id],
     function(err) {
       if (err) {
         res.status(500).json({ erro: err.message });
