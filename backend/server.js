@@ -1,5 +1,4 @@
 // server.js - Backend Express.js com SQLite
-
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
@@ -18,12 +17,23 @@ const db = new sqlite3.Database('./medical_records.db', (err) => {
     console.error('Erro ao conectar ao banco:', err);
   } else {
     console.log('Conectado ao SQLite');
-    criarTabela();
+    criarTabelas();
   }
 });
 
-// Criar tabela se não existir
-function criarTabela() {
+// Criar tabelas se não existirem
+function criarTabelas() {
+  // Tabela de usuários
+  db.run(`
+    CREATE TABLE IF NOT EXISTS usuarios (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  // Tabela de pacientes
   db.run(`
     CREATE TABLE IF NOT EXISTS pacientes (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -35,7 +45,36 @@ function criarTabela() {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+  // Inserir usuário padrão se não existir
+  db.run(`
+    INSERT OR IGNORE INTO usuarios (username, password) VALUES (?, ?)
+  `, ['admin', 'admin123']);
 }
+
+// Autenticação middleware
+app.use((req, res, next) => {
+  // Permitir rotas de login e verificação sem autenticação
+  if (req.path === '/api/login' || req.path === '/api/verify') {
+    next();
+  } else {
+    // Verificar autenticação para outras rotas
+    if (!req.headers.authorization) {
+      return res.status(401).json({ erro: 'Autenticação necessária' });
+    }
+    
+    try {
+      const token = req.headers.authorization.split(' ')[1];
+      // Verificar token (simplificado para este exemplo)
+      if (token !== 'secret-token') {
+        return res.status(401).json({ erro: 'Token inválido' });
+      }
+      next();
+    } catch (error) {
+      res.status(401).json({ erro: 'Falha na autenticação' });
+    }
+  }
+});
 
 // GET - Listar todos os pacientes
 app.get('/api/pacientes', (req, res) => {
@@ -120,6 +159,39 @@ app.delete('/api/pacientes/:id', (req, res) => {
       res.json({ mensagem: 'Paciente deletado com sucesso' });
     }
   });
+});
+
+// POST - Autenticar usuário
+app.post('/api/login', (req, res) => {
+  const { username, password } = req.body;
+  
+  if (!username || !password) {
+    return res.status(400).json({ erro: 'Username e password são obrigatórios' });
+  }
+  
+  db.get('SELECT * FROM usuarios WHERE username = ?', [username], (err, user) => {
+    if (err) {
+      return res.status(500).json({ erro: err.message });
+    }
+    
+    if (!user) {
+      return res.status(404).json({ erro: 'Usuário não encontrado' });
+    }
+    
+    // Verificar senha (em um cenário real, compare hashes)
+    if (password !== user.password) {
+      return res.status(401).json({ erro: 'Senha incorreta' });
+    }
+    
+    // Gerar token de autenticação
+    const token = 'secret-token';
+    res.json({ token });
+  });
+});
+
+// GET - Verificar autenticação
+app.get('/api/verify', (req, res) => {
+  res.json({ authenticated: true });
 });
 
 app.listen(PORT, () => {
