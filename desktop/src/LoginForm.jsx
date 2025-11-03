@@ -1,55 +1,55 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useState } from "react";
+import { useNavigate } from "react-router";
 
 function LoginForm() {
   const [formData, setFormData] = useState({
-    username: '',
-    password: ''
+    username: "",
+    password: "",
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
+  const handleSubmit = async () => {
+
     if (!formData.username || !formData.password) {
-      setError('Preencha todos os campos');
+      setError("Preencha todos os campos");
       return;
     }
 
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const response = await fetch('http://localhost:5000/api/login', {
-        method: 'POST',
+      const response = await fetch("http://localhost:5000/api/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.erro || 'Erro ao autenticar');
+        throw new Error(data.erro || "Erro ao autenticar");
       }
 
       // Armazenar token (em um cenário real, use localStorage ou sessionStorage)
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('authenticated', true);
-      
+      sessionStorage.setItem("token", data.token);
+      sessionStorage.setItem("authenticated", true);
+
       // Redirecionar para o aplicativo principal
-      navigate('/app');
+      console.log("Redirect do LoginForm");
+      navigate("/home");
     } catch (err) {
       setError(err.message);
       console.error(err);
@@ -61,12 +61,10 @@ function LoginForm() {
   return (
     <div className="login-container">
       <div className="login-form">
-        <h2>MedCard - Login</h2>
+        <h2>MedCard</h2>
         <p>Acesse seu sistema de fichas médicas</p>
-        
+
         {error && <div className="error-message">{error}</div>}
-        
-        <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Usuário:</label>
             <input
@@ -91,20 +89,9 @@ function LoginForm() {
             />
           </div>
 
-          <button 
-            type="submit" 
-            className="btn-primary" 
-            disabled={loading}
-          >
-            {loading ? 'Entrando...' : 'Entrar'}
+          <button type="submit" className="btn-primary" disabled={loading} onClick={handleSubmit}>
+            {loading ? "Entrando..." : "Entrar"}
           </button>
-        </form>
-        
-        <div className="login-info">
-          <p><strong>Demo:</strong></p>
-          <p>Usuário: admin</p>
-          <p>Senha: admin123</p>
-        </div>
       </div>
     </div>
   );

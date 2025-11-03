@@ -42,6 +42,7 @@ function criarTabelas() {
       cep TEXT NOT NULL,
       endereco TEXT NOT NULL,
       operacao TEXT NOT NULL,
+      anotacoes TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
@@ -103,20 +104,29 @@ app.get('/api/pacientes/:id', (req, res) => {
 
 // POST - Criar novo paciente
 app.post('/api/pacientes', (req, res) => {
-  const { nome, idade, cep, endereco, operacao } = req.body;
+  const { nome, idade, cep, endereco, operacao, anotacoes } = req.body;
 
   if (!nome || !idade || !cep || !endereco || !operacao) {
     return res.status(400).json({ erro: 'Todos os campos são obrigatórios' });
   }
 
   db.run(
-    'INSERT INTO pacientes (nome, idade, cep, endereco, operacao) VALUES (?, ?, ?, ?, ?)',
-    [nome, idade, cep, endereco, operacao],
-    function(err) {
+    "INSERT INTO pacientes (nome, idade, cep, endereco, operacao, anotacoes) VALUES (?, ?, ?, ?, ?, ?)",
+    [nome, idade, cep, endereco, operacao, anotacoes],
+    function (err) {
       if (err) {
         res.status(500).json({ erro: err.message });
       } else {
-        res.status(201).json({ id: this.lastID, nome, idade, endereco, operacao });
+        res
+          .status(201)
+          .json({
+            id: this.lastID,
+            nome,
+            idade,
+            endereco,
+            operacao,
+            anotacoes
+          });
       }
     }
   );
@@ -125,22 +135,29 @@ app.post('/api/pacientes', (req, res) => {
 // PUT - Atualizar paciente
 app.put('/api/pacientes/:id', (req, res) => {
   const { id } = req.params;
-  const { nome, idade, cep, endereco, operacao } = req.body;
+  const { nome, idade, cep, endereco, operacao, anotacoes } = req.body;
 
   if (!nome || !idade || !cep || !endereco || !operacao) {
     return res.status(400).json({ erro: 'Todos os campos são obrigatórios' });
   }
 
   db.run(
-    'UPDATE pacientes SET nome = ?, idade = ?, cep = ?, endereco = ?, operacao = ? WHERE id = ?',
-    [nome, idade, cep, endereco, operacao, id],
-    function(err) {
+    "UPDATE pacientes SET nome = ?, idade = ?, cep = ?, endereco = ?, operacao = ?, anotacoes = ? WHERE id = ?",
+    [nome, idade, cep, endereco, operacao, anotacoes, id],
+    function (err) {
       if (err) {
         res.status(500).json({ erro: err.message });
       } else if (this.changes === 0) {
-        res.status(404).json({ erro: 'Paciente não encontrado' });
+        res.status(404).json({ erro: "Paciente não encontrado" });
       } else {
-        res.json({ id: parseInt(id), nome, idade, endereco, operacao });
+        res.json({
+          id: parseInt(id),
+          nome,
+          idade,
+          endereco,
+          operacao,
+          anotacoes,
+        });
       }
     }
   );

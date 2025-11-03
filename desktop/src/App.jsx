@@ -1,30 +1,17 @@
-/* eslint-disable no-unused-vars */
-import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router';
+import { BrowserRouter as Router, Routes, Route } from 'react-router';
 import './index.css';
 import LoginForm from './LoginForm';
-import ProjectRoutes from './ProjectRoutes';
-import {Clipboard, ClipboardPlus, Pen, Trash, Trash2} from "lucide-react"
+import ListaFichas from './ListaFichas';
+import Configuracoes from './Configuracoes';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    const auth = localStorage.getItem('authenticated') === true;
-    setIsAuthenticated(auth);
-  }, []);
 
   return (
     <Router>
       <Routes>
-        <Route 
-          path="/login" 
-          element={isAuthenticated ? <Navigate to="/" replace={true} /> : <LoginForm />} 
-        />
-        <Route 
-          path="/app" 
-          element={isAuthenticated ? <ProjectRoutes /> : <Navigate to="/login" replace={true} />} 
-        />
+        <Route path="/" element={<LoginForm />} />
+        <Route path="/home" element={<ListaFichas />} />
+        <Route path="/configuracoes" element={<Configuracoes />} />
       </Routes>
     </Router>
   );

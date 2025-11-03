@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import {Clipboard, ClipboardPlus, Pen, Trash, Trash2} from "lucide-react"
+import {ClipboardPlus, LogOut, Pen, Settings, Trash2} from "lucide-react"
 import './index.css';
 
-function ProjectRoutes() {
+function ListaFichas() {
   const [pacientes, setPacientes] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -12,7 +12,8 @@ function ProjectRoutes() {
     idade: '',
     cep: '',
     endereco: '',
-    operacao: ''
+    operacao: '',
+    anotacoes: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -22,19 +23,20 @@ function ProjectRoutes() {
 
   // Verificar autenticação ao carregar
   useEffect(() => {
-    const isAuthenticated = localStorage.getItem('authenticated') === 'true';
+    const isAuthenticated = sessionStorage.getItem("authenticated");
+    console.log("Autenticado?", isAuthenticated);
     if (!isAuthenticated) {
-      navigate('/login');
+      navigate('/');
       return;
     }
 
     carregarPacientes();
-  }, [navigate]);
+  }, []);
 
   const carregarPacientes = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const response = await fetch(API_URL, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -62,11 +64,11 @@ function ProjectRoutes() {
 
     // Auto-fetch address when CEP is entered
     if (name === 'cep' && value.length === 8) {
-      fetchAddressByCEP(value);
+      buscarCEP(value);
     }
   };
 
-  const fetchAddressByCEP = async (cep) => {
+  const buscarCEP = async (cep) => {
     try {
       const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
       if (!response.ok) throw new Error('Erro ao buscar CEP');
@@ -93,12 +95,12 @@ function ProjectRoutes() {
     e.preventDefault();
     
     if (!formData.nome || !formData.idade || !formData.cep || !formData.endereco || !formData.operacao) {
-      setError('Preencha todos os campos');
+      setError('Preencha todos os campos obrigatórios.');
       return;
     }
 
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       let response;
       
       if (editingId) {
@@ -144,7 +146,7 @@ function ProjectRoutes() {
     if (!window.confirm('Tem certeza que deseja deletar este paciente?')) return;
 
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const response = await fetch(`${API_URL}/${id}`, {
         method: 'DELETE',
         headers: {
@@ -170,34 +172,43 @@ function ProjectRoutes() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('authenticated');
-    navigate('/login');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('authenticated');
+    navigate('/');
   };
 
   return (
     <div className="app">
       <header className="header">
         <div className="header-left">
-          <h1>
-            MedCard
-          </h1>
+          <h1>MedCard</h1>
         </div>
         <div className="header-right">
           {!showForm && (
-            <button 
+            <button
               className="btn-primary"
               onClick={() => setShowForm(!showForm)}
               disabled={loading}
             >
-              <><ClipboardPlus/> Nova Ficha</>
+              <>
+                <ClipboardPlus /> Nova Ficha
+              </>
             </button>
           )}
-          <button 
-            className="btn-logout"
-            onClick={handleLogout}
+          <button
+            className="btn-settings"
+            onClick={() => {
+              navigate("/configuracoes");
+            }}
           >
-            Sair
+            <>
+              <Settings /> Configurações
+            </>
+          </button>
+          <button className="btn-logout" onClick={handleLogout}>
+            <>
+              <LogOut /> Sair
+            </>
           </button>
         </div>
       </header>
@@ -206,32 +217,34 @@ function ProjectRoutes() {
 
       {showForm ? (
         <form className="form-container" onSubmit={handleSubmit}>
-          <h2>{editingId ? 'Editar Paciente' : 'Adicionar Novo Paciente'}</h2>
-          
+          <h2>{editingId ? "Editar Paciente" : "Adicionar Novo Paciente"}</h2>
+
           <div className="form-group">
-            <label>Nome:</label>
+            <label>Nome</label>
             <input
               type="text"
               name="nome"
               value={formData.nome}
               onChange={handleInputChange}
               placeholder="Digite o nome do paciente"
+              maxLength="100"
             />
           </div>
 
           <div className="form-group">
-            <label>Idade:</label>
+            <label>Idade</label>
             <input
               type="text"
               name="idade"
               value={formData.idade}
               onChange={handleInputChange}
               placeholder="Digite a idade"
+              maxLength="3"
             />
           </div>
 
           <div className="form-group">
-            <label>CEP:</label>
+            <label>CEP</label>
             <input
               type="text"
               name="cep"
@@ -243,7 +256,7 @@ function ProjectRoutes() {
           </div>
 
           <div className="form-group">
-            <label>Endereço:</label>
+            <label>Endereço</label>
             <input
               type="text"
               name="endereco"
@@ -251,30 +264,43 @@ function ProjectRoutes() {
               onChange={handleInputChange}
               placeholder="O endereço será preenchido automaticamente"
               readOnly
+              maxLength="100"
             />
           </div>
 
           <div className="form-group">
-            <label>Operação Realizada:</label>
+            <label>Operação Realizada</label>
             <input
               type="text"
               name="operacao"
               value={formData.operacao}
               onChange={handleInputChange}
               placeholder="Digite a operação realizada"
+              maxLength="100"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Anotações Extras</label>
+            <input
+              type="text"
+              name="anotacoes"
+              value={formData.anotacoes}
+              onChange={handleInputChange}
+              maxLength="1000"
             />
           </div>
 
           <div className="form-buttons">
             <button type="submit" className="btn-success">
-              {editingId ? 'Atualizar' : 'Salvar'}
+              {editingId ? "Atualizar" : "Salvar"}
             </button>
             <button type="button" className="btn-cancel" onClick={handleCancel}>
               Cancelar
             </button>
           </div>
         </form>
-      ): (
+      ) : (
         <div className="list-container">
           {loading ? (
             <p>Carregando pacientes...</p>
@@ -282,33 +308,39 @@ function ProjectRoutes() {
             <p className="empty-state">Nenhuma ficha médica cadastrada</p>
           ) : (
             <div className="pacientes-grid">
-              {pacientes.map(paciente => (
+              {pacientes.map((paciente) => (
                 <div key={paciente.id} className="paciente-card">
                   <div className="card-header">
                     <h3>{paciente.nome}</h3>
                     <span className="id-badge">ID: {paciente.id}</span>
                   </div>
-                  
+
                   <div className="card-content">
-                    <p><strong>Idade:</strong> {paciente.idade} anos</p>
-                    <p><strong>Endereço:</strong> {paciente.endereco}</p>
-                    <p><strong>Operação:</strong> {paciente.operacao}</p>
+                    <p>
+                      <strong>Idade:</strong> {paciente.idade} anos
+                    </p>
+                    <p>
+                      <strong>Endereço:</strong> {paciente.endereco}
+                    </p>
+                    <p>
+                      <strong>Operação:</strong> {paciente.operacao}
+                    </p>
                   </div>
 
                   <div className="card-actions">
-                    <button 
+                    <button
                       className="btn-edit"
                       onClick={() => handleEdit(paciente)}
                     >
                       <Pen />
-                     <p>Editar</p>
+                      <p>Editar</p>
                     </button>
-                    <button 
+                    <button
                       className="btn-delete"
                       onClick={() => handleDelete(paciente.id)}
                     >
                       <Trash2 />
-                     <p>Remover</p>
+                      <p>Remover</p>
                     </button>
                   </div>
                 </div>
@@ -321,4 +353,4 @@ function ProjectRoutes() {
   );
 }
 
-export default ProjectRoutes;
+export default ListaFichas;
