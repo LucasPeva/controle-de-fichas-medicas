@@ -1,8 +1,6 @@
-// server.js - Backend Express.js com SQLite
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
-const path = require('path');
 
 const app = express();
 const PORT = 5000;
@@ -55,8 +53,7 @@ function criarTabelas() {
 
 // Autenticação middleware
 app.use((req, res, next) => {
-  // Permitir rotas de login e verificação sem autenticação
-  if (req.path === '/api/login' || req.path === '/api/verify') {
+  if (req.path === '/api/login') {
     next();
   } else {
     // Verificar autenticação para outras rotas
@@ -66,9 +63,9 @@ app.use((req, res, next) => {
     
     try {
       const token = req.headers.authorization.split(' ')[1];
-      // Verificar token (simplificado para este exemplo)
-      if (token !== 'secret-token') {
-        return res.status(401).json({ erro: 'Token inválido' });
+      
+      if (token !== "super-senha-secreta") {
+        return res.status(401).json({ erro: "Token inválido" });
       }
       next();
     } catch (error) {
@@ -178,12 +175,25 @@ app.delete('/api/pacientes/:id', (req, res) => {
   });
 });
 
+// ------------------------------------------ SEGURANÇA ------------------------------------- //
+
+// GET - Listar todos os usuários
+app.get('/api/usuarios', (req, res) => {
+  db.all('SELECT * FROM usuarios ORDER BY created_at DESC', [], (err, rows) => {
+    if (err) {
+      res.status(500).json({ erro: err.message });
+    } else {
+      res.json(rows);
+    }
+  });
+});
+
 // POST - Autenticar usuário
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
   
   if (!username || !password) {
-    return res.status(400).json({ erro: 'Username e password são obrigatórios' });
+    return res.status(400).json({ erro: 'Login e senha são obrigatórios' });
   }
   
   db.get('SELECT * FROM usuarios WHERE username = ?', [username], (err, user) => {
@@ -195,20 +205,14 @@ app.post('/api/login', (req, res) => {
       return res.status(404).json({ erro: 'Usuário não encontrado' });
     }
     
-    // Verificar senha (em um cenário real, compare hashes)
     if (password !== user.password) {
       return res.status(401).json({ erro: 'Senha incorreta' });
     }
     
     // Gerar token de autenticação
-    const token = 'secret-token';
+    const token = 'super-senha-secreta';
     res.json({ token });
   });
-});
-
-// GET - Verificar autenticação
-app.get('/api/verify', (req, res) => {
-  res.json({ authenticated: true });
 });
 
 app.listen(PORT, () => {

@@ -43,12 +43,10 @@ function LoginForm() {
         throw new Error(data.erro || "Erro ao autenticar");
       }
 
-      // Armazenar token (em um cenário real, use localStorage ou sessionStorage)
+      // Armazena o token 
       sessionStorage.setItem("token", data.token);
       sessionStorage.setItem("authenticated", true);
 
-      // Redirecionar para o aplicativo principal
-      console.log("Redirect do LoginForm");
       navigate("/home");
     } catch (err) {
       setError(err.message);
@@ -66,25 +64,23 @@ function LoginForm() {
 
         {error && <div className="error-message">{error}</div>}
           <div className="form-group">
-            <label>Usuário:</label>
+            <label>Usuário</label>
             <input
               type="text"
               name="username"
               value={formData.username}
               onChange={handleInputChange}
-              placeholder="Digite seu usuário"
               disabled={loading}
             />
           </div>
 
           <div className="form-group">
-            <label>Senha:</label>
+            <label>Senha</label>
             <input
               type="password"
               name="password"
               value={formData.password}
               onChange={handleInputChange}
-              placeholder="Digite sua senha"
               disabled={loading}
             />
           </div>

@@ -31,7 +31,7 @@ body {
   font-size: 28px;
 }
 
-.btn-primary {
+.btnPrimary {
   background: #0d4979ff;
   color: white;
   border: none;
@@ -46,17 +46,17 @@ body {
   gap: 10px;
 }
 
-.btn-primary:hover:not(:disabled) {
+.btnPrimary:hover:not(:disabled) {
   background: #136ab1;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
-.btn-primary:disabled {
+.btnPrimary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.btn-settings {
+.btnSettings {
   background: #6fabdd;
   color: black;
   border: none;
@@ -71,12 +71,12 @@ body {
   gap: 10px;
 }
 
-.btn-settings:hover:not(:disabled) {
+.btnSettings:hover:not(:disabled) {
   background: #90b4d2;
   box-shadow: 0 4px 12px #b2c0ff66;
 }
 
-.btn-settings:disabled {
+.btnSettings:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -172,7 +172,7 @@ body {
   background: #a0aec0;
 }
 
-.list-container {
+.listContainer {
   background: white;
   padding: 30px;
   border-radius: 12px;
@@ -186,13 +186,13 @@ body {
   padding: 40px 20px;
 }
 
-.pacientes-grid {
+.pacientesGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 20px;
 }
 
-.paciente-card {
+.pacienteCard {
   background: #f8f9fa;
   border: 2px solid #e0e0e0;
   border-radius: 10px;
@@ -200,22 +200,22 @@ body {
   transition: all 0.3s ease;
 }
 
-.paciente-card:hover {
+.pacienteCard:hover {
   border-color: #0d4979ff;
   box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
   transform: translateY(-5px);
 }
 
-.card-header {
+.cardHeader {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: start;
   margin-bottom: 15px;
   border-bottom: 2px solid #e0e0e0;
   padding-bottom: 12px;
 }
 
-.card-header h3 {
+.cardHeader h3 {
   color: #333;
   font-size: 18px;
   margin: 0;
@@ -231,27 +231,27 @@ body {
   min-width: 50px;
 }
 
-.card-content {
+.cardContent {
   margin-bottom: 15px;
 }
 
-.card-content p {
+.cardContent p {
   color: #555;
   margin-bottom: 10px;
   font-size: 14px;
   line-height: 1.6;
 }
 
-.card-content strong {
+.cardContent strong {
   color: #333;
 }
 
-.card-actions {
+.cardActions {
   display: flex;
   gap: 10px;
 }
 
-.btn-edit,
+.btnEdit,
 .btn-delete {
   flex: 1;
   border: none;
@@ -263,12 +263,12 @@ body {
   transition: all 0.3s ease;
 }
 
-.btn-edit {
+.btnEdit {
   background: #bee3f8;
   color: #2c5aa0;
 }
 
-.btn-edit:hover {
+.btnEdit:hover {
   background: #90cdf4;
 }
 
@@ -291,11 +291,11 @@ body {
     font-size: 22px;
   }
 
-  .btn-primary {
+  .btnPrimary {
     width: 100%;
   }
 
-  .pacientes-grid {
+  .pacientesGrid {
     grid-template-columns: 1fr;
   }
 
@@ -362,7 +362,7 @@ body {
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.login-form .btn-primary {
+.login-form .btnPrimary {
   width: 100%;
   background: #0d4979ff;
   color: white;
@@ -376,12 +376,12 @@ body {
   margin-bottom: 20px;
 }
 
-.login-form .btn-primary:hover:not(:disabled) {
+.login-form .btnPrimary:hover:not(:disabled) {
   background: #136ab1;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
-.login-form .btn-primary:disabled {
+.login-form .btnPrimary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -403,7 +403,7 @@ body {
   color: #333;
 }
 
-.btn-logout {
+.btnLogout {
   display: flex;
   align-items: center;
   background: #e53e3e;
@@ -417,17 +417,17 @@ body {
   transition: all 0.3s ease;
 }
 
-.btn-logout:hover {
+.btnLogout:hover {
   background: #c53030;
   box-shadow: 0 4px 12px rgba(229, 62, 62, 0.4);
 }
 
-.header-left {
+.headerLeft {
   display: flex;
   align-items: center;
 }
 
-.header-right {
+.headerRight {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -438,13 +438,13 @@ body {
     padding: 30px 20px;
   }
   
-  .header-right {
+  .headerRight {
     flex-direction: column;
     gap: 10px;
     width: 100%;
   }
   
-  .btn-logout {
+  .btnLogout {
     width: 100%;
     margin-left: 0;
   }

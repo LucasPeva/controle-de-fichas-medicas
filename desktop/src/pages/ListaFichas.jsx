@@ -1,32 +1,31 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
-import {ClipboardPlus, LogOut, Pen, Settings, Trash2} from "lucide-react"
-import './index.css';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
+import { ClipboardPlus, LogOut, Pen, Settings, Trash2 } from "lucide-react";
+import "../index.css"
 
 function ListaFichas() {
   const [pacientes, setPacientes] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
-    nome: '',
-    idade: '',
-    cep: '',
-    endereco: '',
-    operacao: '',
-    anotacoes: ''
+    nome: "",
+    idade: "",
+    cep: "",
+    endereco: "",
+    operacao: "",
+    anotacoes: "",
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const API_URL = 'http://localhost:5000/api/pacientes';
+  const API_URL = "http://localhost:5000/api/pacientes";
 
   // Verificar autenticação ao carregar
   useEffect(() => {
     const isAuthenticated = sessionStorage.getItem("authenticated");
-    console.log("Autenticado?", isAuthenticated);
     if (!isAuthenticated) {
-      navigate('/');
+      navigate("/");
       return;
     }
 
@@ -36,19 +35,19 @@ function ListaFichas() {
   const carregarPacientes = async () => {
     setLoading(true);
     try {
-      const token = sessionStorage.getItem('token');
+      const token = sessionStorage.getItem("token");
       const response = await fetch(API_URL, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      
-      if (!response.ok) throw new Error('Erro ao carregar pacientes');
+
+      if (!response.ok) throw new Error("Erro ao carregar pacientes");
       const data = await response.json();
       setPacientes(data);
-      setError('');
+      setError("");
     } catch (err) {
-      setError('Erro ao carregar os dados');
+      setError("Erro ao carregar os dados");
       console.error(err);
     } finally {
       setLoading(false);
@@ -57,13 +56,12 @@ function ListaFichas() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
 
-    // Auto-fetch address when CEP is entered
-    if (name === 'cep' && value.length === 8) {
+    if (name === "cep" && value.length === 8) {
       buscarCEP(value);
     }
   };
@@ -71,67 +69,73 @@ function ListaFichas() {
   const buscarCEP = async (cep) => {
     try {
       const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-      if (!response.ok) throw new Error('Erro ao buscar CEP');
-      
+      if (!response.ok) throw new Error("Erro ao buscar CEP");
+
       const data = await response.json();
-      
+
       if (data.erro) {
-        setError('CEP não encontrado');
+        setError("CEP não encontrado");
         return;
       }
 
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        endereco: `${data.logradouro}, ${data.bairro} - ${data.localidade}/${data.uf}`
+        endereco: `${data.logradouro}, ${data.bairro} - ${data.localidade}/${data.uf}`,
       }));
-      setError('');
+      setError("");
     } catch (err) {
-      setError('Erro ao buscar endereço pelo CEP');
+      setError("Erro ao buscar endereço pelo CEP");
       console.error(err);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!formData.nome || !formData.idade || !formData.cep || !formData.endereco || !formData.operacao) {
-      setError('Preencha todos os campos obrigatórios.');
+
+    if (
+      !formData.nome ||
+      !formData.idade ||
+      !formData.cep ||
+      !formData.endereco ||
+      !formData.operacao
+    ) {
+      setError("Preencha todos os campos obrigatórios.");
       return;
     }
 
     try {
-      const token = sessionStorage.getItem('token');
+      const token = sessionStorage.getItem("token");
       let response;
-      
+
       if (editingId) {
         response = await fetch(`${API_URL}/${editingId}`, {
-          method: 'PUT',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(formData)
+          body: JSON.stringify(formData),
         });
       } else {
         response = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(formData)
+          body: JSON.stringify(formData),
         });
       }
 
-      if (!response.ok) throw new Error('Erro ao salvar paciente');
+      if (!response.ok) throw new Error("Erro ao salvar paciente");
 
       await carregarPacientes();
-      setFormData({ nome: '', idade: '', cep: '', endereco: '', operacao: '' });
+      setFormData({ nome: "", idade: "", cep: "", endereco: "", operacao: "" });
       setShowForm(false);
       setEditingId(null);
-      setError('');
+      setError("");
     } catch (err) {
-      setError('Erro ao salvar os dados');
+      setError("Erro ao salvar os dados");
       console.error(err);
     }
   };
@@ -143,23 +147,24 @@ function ListaFichas() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Tem certeza que deseja deletar este paciente?')) return;
+    if (!window.confirm("Tem certeza que deseja deletar este paciente?"))
+      return;
 
     try {
-      const token = sessionStorage.getItem('token');
+      const token = sessionStorage.getItem("token");
       const response = await fetch(`${API_URL}/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
-      if (!response.ok) throw new Error('Erro ao deletar paciente');
+      if (!response.ok) throw new Error("Erro ao deletar paciente");
 
       await carregarPacientes();
-      setError('');
+      setError("");
     } catch (err) {
-      setError('Erro ao deletar o paciente');
+      setError("Erro ao deletar o paciente");
       console.error(err);
     }
   };
@@ -167,14 +172,14 @@ function ListaFichas() {
   const handleCancel = () => {
     setShowForm(false);
     setEditingId(null);
-    setFormData({ nome: '', idade: '', cep: '', endereco: '', operacao: '' });
-    setError('');
+    setFormData({ nome: "", idade: "", cep: "", endereco: "", operacao: "" });
+    setError("");
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('authenticated');
-    navigate('/');
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("authenticated");
+    navigate("/");
   };
 
   return (
@@ -226,7 +231,6 @@ function ListaFichas() {
               name="nome"
               value={formData.nome}
               onChange={handleInputChange}
-              placeholder="Digite o nome do paciente"
               maxLength="100"
             />
           </div>
@@ -238,7 +242,6 @@ function ListaFichas() {
               name="idade"
               value={formData.idade}
               onChange={handleInputChange}
-              placeholder="Digite a idade"
               maxLength="3"
             />
           </div>
@@ -250,7 +253,6 @@ function ListaFichas() {
               name="cep"
               value={formData.cep}
               onChange={handleInputChange}
-              placeholder="Digite o CEP"
               maxLength="9"
             />
           </div>
@@ -275,7 +277,6 @@ function ListaFichas() {
               name="operacao"
               value={formData.operacao}
               onChange={handleInputChange}
-              placeholder="Digite a operação realizada"
               maxLength="100"
             />
           </div>

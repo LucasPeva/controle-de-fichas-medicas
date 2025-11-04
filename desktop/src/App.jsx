@@ -1,8 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router';
 import './index.css';
-import LoginForm from './LoginForm';
-import ListaFichas from './ListaFichas';
-import Configuracoes from './Configuracoes';
+import LoginForm from './pages/TelaLogin';
+import ListaFichas from './pages/ListaFichas';
+import Configuracoes from './pages/Configuracoes';
+import Usuarios from './pages/Usuarios';
 
 function App() {
 
@@ -12,6 +13,7 @@ function App() {
         <Route path="/" element={<LoginForm />} />
         <Route path="/home" element={<ListaFichas />} />
         <Route path="/configuracoes" element={<Configuracoes />} />
+        <Route path='/configuracoes/usuarios' element={<Usuarios />} />
       </Routes>
     </Router>
   );
