@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { getApiUrl } from '../config';
 
 export default function ListaFichas() {
   const [pacientes, setPacientes] = useState([]);
@@ -18,15 +19,23 @@ export default function ListaFichas() {
   const [error, setError] = useState('');
   const navigation = useNavigation();
 
-  const API_URL = 'http://localhost:5000/api/pacientes';
+  const [API_URL, setAPI_URL] = useState("");
+
+  useEffect(() => {
+    const loadApiUrl = async () => {
+      const url = await getApiUrl('/api/pacientes');
+      setAPI_URL(url);      
+    };
+    loadApiUrl();
+  }, []);
 
   // Verificar autenticação ao carregar
   useEffect(() => {
-    const isAuthenticated = global.authenticated;
-    if (!isAuthenticated) {
-      navigation.navigate('Login');
-      return;
-    }
+    // const isAuthenticated = global.authenticated;
+    // if (!isAuthenticated) {
+    //   navigation.navigate('Login');
+    //   return;
+    // }
 
     carregarPacientes();
   }, []);
@@ -35,7 +44,8 @@ export default function ListaFichas() {
     setLoading(true);
     try {
       const token = global.token;
-      const response = await fetch(API_URL, {
+      const url = await getApiUrl('/api/pacientes')
+      const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

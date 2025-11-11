@@ -1,17 +1,17 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import TelaLogin from './src/pages/TelaLogin';
-import ListaFichas from './src/pages/ListaFichas';
-import Configuracoes from './src/pages/Configuracoes';
-import Usuarios from './src/pages/Usuarios';
+import TelaLogin from './pages/TelaLogin';
+import ListaFichas from './pages/ListaFichas';
+import Configuracoes from './pages/Configuracoes';
+import Usuarios from './pages/Usuarios';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
+      <Stack.Navigator initialRouteName="Home">
         <Stack.Screen 
           name="Login" 
           component={TelaLogin} 
@@ -20,17 +20,17 @@ export default function App() {
         <Stack.Screen 
           name="Home" 
           component={ListaFichas} 
-          options={{ title: 'Fichas Médicas' }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen 
           name="Configuracoes" 
           component={Configuracoes} 
-          options={{ title: 'Configurações' }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen 
           name="Usuarios" 
           component={Usuarios} 
-          options={{ title: 'Usuários' }}
+          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>

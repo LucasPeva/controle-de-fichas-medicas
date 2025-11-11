@@ -1,18 +1,27 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { getApiUrl } from "../config";
 
 export default function TelaLogin() {
   const [formData, setFormData] = useState({
-    username: '',
-    password: '',
+    username: "",
+    password: "",
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
   const handleInputChange = (name, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -20,33 +29,35 @@ export default function TelaLogin() {
 
   const handleSubmit = async () => {
     if (!formData.username || !formData.password) {
-      setError('Preencha todos os campos');
+      setError("Preencha todos os campos");
       return;
     }
 
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const response = await fetch('http://localhost:5000/api/login', {
-        method: 'POST',
+      const loginUrl = await getApiUrl('/api/login');
+      const response = await fetch(loginUrl, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
 
+      const data = await response.json();
+      
       if (!response.ok) {
-        throw new Error(data.erro || 'Erro ao autenticar');
+        throw new Error(data.erro || "Erro ao autenticar");
       }
 
       // Armazena o token
       global.token = data.token;
       global.authenticated = true;
 
-      navigation.navigate('Home');
+      navigation.navigate("Home");
     } catch (err) {
       setError(err.message);
       console.error(err);
@@ -59,7 +70,9 @@ export default function TelaLogin() {
     <View style={styles.container}>
       <View style={styles.loginForm}>
         <Text style={styles.title}>MedCard</Text>
-        <Text style={styles.subtitle}>Acesse seu sistema de fichas médicas</Text>
+        <Text style={styles.subtitle}>
+          Acesse seu sistema de fichas médicas
+        </Text>
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
@@ -68,7 +81,7 @@ export default function TelaLogin() {
           <TextInput
             style={styles.input}
             value={formData.username}
-            onChangeText={(text) => handleInputChange('username', text)}
+            onChangeText={(text) => handleInputChange("username", text)}
             editable={!loading}
             placeholder="Digite seu usuário"
           />
@@ -79,7 +92,7 @@ export default function TelaLogin() {
           <TextInput
             style={styles.input}
             value={formData.password}
-            onChangeText={(text) => handleInputChange('password', text)}
+            onChangeText={(text) => handleInputChange("password", text)}
             editable={!loading}
             placeholder="Digite sua senha"
             secureTextEntry
@@ -87,7 +100,9 @@ export default function TelaLogin() {
         </View>
 
         <TouchableOpacity
-          style={loading ? [styles.button, styles.buttonDisabled] : styles.button}
+          style={
+            loading ? [styles.button, styles.buttonDisabled] : styles.button
+          }
           onPress={handleSubmit}
           disabled={loading}
         >
@@ -105,19 +120,19 @@ export default function TelaLogin() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#0d4979ff',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#0d4979ff",
     padding: 20,
   },
   loginForm: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     padding: 40,
     borderRadius: 16,
-    width: '100%',
+    width: "100%",
     maxWidth: 400,
-    alignItems: 'center',
-    shadowColor: '#000',
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 10,
@@ -128,57 +143,57 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    color: '#333',
+    color: "#333",
     marginBottom: 10,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: "#666",
     marginBottom: 30,
   },
   errorText: {
-    color: '#c33',
-    backgroundColor: '#fee',
+    color: "#c33",
+    backgroundColor: "#fee",
     padding: 15,
     borderRadius: 8,
     marginBottom: 20,
-    textAlign: 'center',
-    width: '100%',
+    textAlign: "center",
+    width: "100%",
   },
   formGroup: {
-    width: '100%',
+    width: "100%",
     marginBottom: 20,
   },
   label: {
     fontSize: 14,
-    color: '#555',
-    fontWeight: '600',
+    color: "#555",
+    fontWeight: "600",
     marginBottom: 8,
   },
   input: {
-    width: '100%',
+    width: "100%",
     padding: 12,
     borderWidth: 2,
-    borderColor: '#e0e0e0',
+    borderColor: "#e0e0e0",
     borderRadius: 8,
     fontSize: 16,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: "#f9f9f9",
   },
   button: {
-    width: '100%',
-    backgroundColor: '#0d4979ff',
+    width: "100%",
+    backgroundColor: "#0d4979ff",
     padding: 14,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 10,
   },
   buttonDisabled: {
     opacity: 0.6,
   },
   buttonText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });
