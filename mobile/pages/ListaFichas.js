@@ -31,11 +31,11 @@ export default function ListaFichas() {
 
   // Verificar autenticação ao carregar
   useEffect(() => {
-    // const isAuthenticated = global.authenticated;
-    // if (!isAuthenticated) {
-    //   navigation.navigate('Login');
-    //   return;
-    // }
+    const isAuthenticated = global.authenticated;
+    if (!isAuthenticated) {
+      navigation.navigate('Login');
+      return;
+    }
 
     carregarPacientes();
   }, []);
@@ -550,13 +550,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   cardContent: {
-    marginBottom: 15,
+    marginBottom: 15
   },
   cardText: {
     color: '#555',
-    fontSize: 14,
-    marginBottom: 8,
-    lineHeight: 1.6,
   },
   cardLabel: {
     color: '#333',

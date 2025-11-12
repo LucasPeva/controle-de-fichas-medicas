@@ -2,7 +2,7 @@
 const CONFIG_KEY = 'app_config';
 
 const defaultConfig = {
-  apiBaseUrl: 'http://192.168.18.13:5000',
+  apiBaseUrl: 'https://2d0dfcf4e9f2.ngrok-free.app',
 };
 
 // Pega o que tá salvo no global ou o default caso não tenha nada salvo

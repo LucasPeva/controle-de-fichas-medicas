@@ -30,13 +30,6 @@ export default function Configuracoes() {
       return;
     }
 
-    // Validação formatação de IP
-    const ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?::\d+)?$/;
-    if (!ipRegex.test(tempIp)) {
-      Alert.alert('Erro', 'Formato de IP inválido. Use formato como: 192.168.1.1:5000');
-      return;
-    }
-
     try {
       const newBaseUrl = tempIp.includes(':') ? `http://${tempIp}` : `http://${tempIp}:5000`;
       await updateConfig({ apiBaseUrl: newBaseUrl });

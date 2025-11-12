@@ -215,6 +215,136 @@ app.post('/api/login', (req, res) => {
   });
 });
 
+// POST - Criar novo usuário
+app.post('/api/usuarios', (req, res) => {
+  const { username, password } = req.body;
+  
+  if (!username || !password) {
+    return res.status(400).json({ erro: 'Nome de usuário e senha são obrigatórios' });
+  }
+  
+  // Verificar se usuário já existe
+  db.get('SELECT * FROM usuarios WHERE username = ?', [username], (err, existingUser) => {
+    if (err) {
+      return res.status(500).json({ erro: err.message });
+    }
+    
+    if (existingUser) {
+      return res.status(400).json({ erro: 'Nome de usuário já existe' });
+    }
+    
+    // Criar novo usuário
+    db.run(
+      "INSERT INTO usuarios (username, password) VALUES (?, ?)",
+      [username, password],
+      function (err) {
+        if (err) {
+          res.status(500).json({ erro: err.message });
+        } else {
+          res
+            .status(201)
+            .json({
+              id: this.lastID,
+              username,
+              created_at: new Date().toISOString()
+            });
+        }
+      }
+    );
+  });
+});
+
+// PUT - Atualizar usuário
+app.put('/api/usuarios/:id', (req, res) => {
+  const { id } = req.params;
+  const { username, password } = req.body;
+  
+  if (!username) {
+    return res.status(400).json({ erro: 'Nome de usuário é obrigatório' });
+  }
+  
+  // Verificar se usuário existe
+  db.get('SELECT * FROM usuarios WHERE id = ?', [id], (err, user) => {
+    if (err) {
+      return res.status(500).json({ erro: err.message });
+    }
+    
+    if (!user) {
+      return res.status(404).json({ erro: 'Usuário não encontrado' });
+    }
+    
+    // Verificar se novo username já existe (exceto para o usuário atual)
+    db.get('SELECT * FROM usuarios WHERE username = ? AND id != ?', [username, id], (err, existingUser) => {
+      if (err) {
+        return res.status(500).json({ erro: err.message });
+      }
+      
+      if (existingUser) {
+        return res.status(400).json({ erro: 'Nome de usuário já existe' });
+      }
+      
+      // Atualizar usuário
+      const updateData = [username];
+      const query = "UPDATE usuarios SET username = ?";
+      
+      if (password) {
+        updateData.push(password);
+        query += ", password = ?";
+      }
+      
+      updateData.push(id);
+      query += " WHERE id = ?";
+      
+      db.run(query, updateData, function (err) {
+        if (err) {
+          res.status(500).json({ erro: err.message });
+        } else if (this.changes === 0) {
+          res.status(404).json({ erro: "Usuário não encontrado" });
+        } else {
+          res.json({
+            id: parseInt(id),
+            username,
+            password: password ? '***' : undefined,
+            updated_at: new Date().toISOString()
+          });
+        }
+      });
+    });
+  });
+});
+
+// DELETE - Deletar usuário
+app.delete('/api/usuarios/:id', (req, res) => {
+  const { id } = req.params;
+  
+  // Verificar se usuário existe
+  db.get('SELECT * FROM usuarios WHERE id = ?', [id], (err, user) => {
+    if (err) {
+      return res.status(500).json({ erro: err.message });
+    }
+    
+    if (!user) {
+      return res.status(404).json({ erro: 'Usuário não encontrado' });
+    }
+    
+    // Não permitir deletar o usuário admin
+    if (user.username === 'admin') {
+      return res.status(400).json({ erro: 'Não é possível deletar o usuário admin' });
+    }
+    
+    // Deletar usuário
+    db.run('DELETE FROM usuarios WHERE id = ?', [id], function(err) {
+      if (err) {
+        res.status(500).json({ erro: err.message });
+      } else if (this.changes === 0) {
+        res.status(404).json({ erro: 'Usuário não encontrado' });
+      } else {
+        res.json({ mensagem: 'Usuário deletado com sucesso' });
+      }
+    });
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
 });

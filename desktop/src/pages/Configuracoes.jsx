@@ -44,7 +44,7 @@ function Configuracoes() {
 
             <div className={styles.cardContent}>
               <div className={styles.cardActions}>
-                <button className={styles.btnEdit} onClick={() => {navigate("/configuracoes/usuarios")}}>
+                <button className={styles.btnEdit} onClick={() => {navigate("/usuarios")}}>
                   <Wrench />
                   <p>Editar</p>
                 </button>
